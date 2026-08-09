@@ -865,7 +865,7 @@ function addRow() {
   if (!name || qty === 0 || amount === 0) {
     shakeSidebar(); return;
   }
-
+const calculatedTotal = (work === "Acrylic Partial Denture") ? 400+(qty*amount) : (qty * amount);
   entries.push({
     date,
     name,
@@ -873,7 +873,7 @@ function addRow() {
     work,
     qty,
     amount,
-    total: qty * amount
+    total: calculatedTotal
   });
 
   renderTable();

@@ -382,14 +382,88 @@
     <div class="grid-2">
       <div class="field">
         <label>Work Type</label>
-        <select id="workType" onchange="autoFillPrice()">
-          <option value="">Select...</option>
-          <option value="PFM">PFM</option>
-          <option value="ZR(F)">ZR(F)</option>
-          <option value="CAD MC">CAD MC</option>
-          <option value="FMC">FMC</option>
-          <option value="E-MAX">E-MAX</option>
-        </select>
+        <select id="workType" name="workType">
+  <option value="">Select Work Type...</option>
+
+  <!-- 1. FIXED PROSTHODONTICS -->
+  <optgroup label="Fixed - Porcelain Fused to Metal (PFM)">
+    <option value="PFM Standard">PFM Standard</option>
+    <option value="CAD PFM">CAD PFM</option>
+    <option value="DMLS PFM">DMLS PFM</option>
+    <option value="Tilite PFM">Tilite / Titanium PFM</option>
+    <option value="Gold PFM">Gold / Precious PFM</option>
+  </optgroup>
+
+  <optgroup label="Fixed - All-Ceramic / Metal-Free">
+    <option value="ZR(F) Monolithic">Zirconia Full Contour (Monolithic)</option>
+    <option value="ZR Layered">Zirconia Layered</option>
+    <option value="ZR Ultra-Translucent">Zirconia Ultra-Translucent (Anterior)</option>
+    <option value="E-MAX Press">E-Max Press</option>
+    <option value="E-MAX CAD">E-Max CAD</option>
+    <option value="E-MAX Layered">E-Max Layered</option>
+    <option value="Ceramic Veneer">Feldspathic Veneer</option>
+    <option value="Inlay / Onlay">Ceramic Inlay / Onlay</option>
+  </optgroup>
+
+  <optgroup label="Fixed - Full Metal & Provisionals">
+    <option value="FMC">FMC (Full Metal Crown)</option>
+    <option value="Cast Gold Crown">Cast Gold Crown</option>
+    <option value="PMMA Temporary">PMMA Temporary Crown/Bridge</option>
+    <option value="Composite Restoration">Lab Composite Restoration</option>
+  </optgroup>
+
+  <!-- 2. REMOVABLE PROSTHODONTICS -->
+  <optgroup label="Removable - Complete Dentures">
+    <option value="Complete Denture Acrylic">Complete Denture (Standard Acrylic)</option>
+    <option value="Complete Denture High-Impact">Complete Denture (High Impact)</option>
+    <option value="3D Digital Denture">CAD/CAM 3D Printed Denture</option>
+  </optgroup>
+
+  <optgroup label="Removable - Partial Dentures">
+    <option value="Cast Partial Denture">Cast Partial Denture (Co-Cr Frame)</option>
+    <option value="Valplast / Flexible">Flexible Denture (Valplast/Thermosens)</option>
+    <option value="Acrylic Partial Denture">Acrylic Partial Denture</option>
+    <option value="Acrylic Flipper">Temporary Flipper (1-2 Teeth)</option>
+  </optgroup>
+
+  <optgroup label="Removable - Repairs & Relines">
+    <option value="Denture Reline Hard">Hard Reline</option>
+    <option value="Denture Reline Soft">Soft Reline</option>
+    <option value="Denture Repair">Denture Repair / Tooth Addition</option>
+  </optgroup>
+
+  <!-- 3. IMPLANT PROSTHODONTICS -->
+  <optgroup label="Implant Restorations">
+    <option value="Implant Crown Screw-Retained">Screw-Retained Crown (ZR/PFM)</option>
+    <option value="Implant Crown Cement-Retained">Cement-Retained Crown + Abutment</option>
+    <option value="Custom Titanium Abutment">Custom Titanium Abutment</option>
+    <option value="Custom Zirconia Abutment">Custom Zirconia Abutment</option>
+    <option value="All-on-4 / All-on-6 Hybrid">All-on-4 / All-on-6 Hybrid Bar</option>
+    <option value="Full Arch Zirconia Bridge">Full-Arch Zirconia over Ti-Bar</option>
+    <option value="Implant Overdenture">Implant Overdenture (Locator/Bar)</option>
+  </optgroup>
+
+  <!-- 4. GUARDS, SPLINTS & SLEEP -->
+  <optgroup label="Guards & Occlusal Appliances">
+    <option value="Nightguard Hard">Hard Acrylic Nightguard / Splint</option>
+    <option value="Nightguard Soft">Soft Nightguard</option>
+    <option value="Nightguard Dual">Dual-Laminate Guard (Hard/Soft)</option>
+    <option value="Sports Mouthguard">Custom Sports Mouthguard</option>
+    <option value="MAD Sleep Appliance">Mandibular Advancement Device (Sleep Apnea)</option>
+  </optgroup>
+
+  <!-- 5. ORTHODONTICS & SPECIALTY -->
+  <optgroup label="Orthodontics & Guides">
+    <option value="Clear Aligner Set">Clear Aligner (Per Arch/Set)</option>
+    <option value="Hawley Retainer">Hawley Retainer</option>
+    <option value="Essix Retainer">Essix Clear Retainer</option>
+    <option value="Palatal Expander">Rapid Palatal Expander (RPE/Hyrax)</option>
+    <option value="Space Maintainer">Space Maintainer</option>
+    <option value="3D Surgical Guide">3D Printed Surgical Guide</option>
+    <option value="Diagnostic Wax-up">Diagnostic Wax-up (Per Unit)</option>
+    <option value="Special Tray">Custom Impression Tray</option>
+  </optgroup>
+</select>
       </div>
       <div class="field">
         <label>Unit Price (₹)</label>

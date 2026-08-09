@@ -27,7 +27,34 @@
     background: #f0f4f8;
     min-height: 100vh;
     display: flex;
-    gap: 0;
+    flex-direction: row;
+  }
+
+  /* ── MOBILE NAVBAR TOPBAR ── */
+  .mobile-topbar {
+    display: none;
+    background: var(--ink);
+    color: white;
+    padding: 14px 18px;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .mobile-brand { display: flex; align-items: center; gap: 10px; }
+  .btn-toggle-sidebar {
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   /* ── SIDEBAR ── */
@@ -39,6 +66,7 @@
     flex-direction: column;
     flex-shrink: 0;
     overflow-y: auto;
+    transition: transform 0.3s ease;
   }
   .sidebar-logo {
     padding: 28px 24px 20px;
@@ -107,9 +135,7 @@
   .btn-add:active { transform: scale(0.98); }
   .btn-add svg { width: 16px; height: 16px; }
 
-  .btn-add-alt {
-    background: #d97706;
-  }
+  .btn-add-alt { background: #d97706; }
   .btn-add-alt:hover { background: #b45309; }
 
   .btn-print {
@@ -141,8 +167,8 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px 6px;
-    border-radius: 4px;
+    padding: 6px 8px;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     transition: background 0.2s, color 0.2s;
@@ -200,7 +226,7 @@
     text-transform: uppercase;
   }
   .stmt-meta {
-    display: flex; gap: 24px; margin-top: 24px;
+    display: flex; gap: 16px; margin-top: 24px; flex-wrap: wrap;
   }
   .meta-pill {
     background: rgba(255,255,255,0.08);
@@ -219,15 +245,14 @@
     display: flex; align-items: center; justify-content: space-between;
     background: #f8fafc; border: 1px solid #e2e8f0;
     border-radius: 12px; padding: 16px 20px;
-    margin-bottom: 28px;
-    transition: all 0.3s;
+    margin-bottom: 28px; gap: 12px;
   }
   .client-left { display: flex; align-items: center; gap: 14px; }
   .client-avatar {
     width: 44px; height: 44px; border-radius: 12px;
     background: var(--accent);
     display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 800; color: white;
+    font-size: 16px; font-weight: 800; color: white; flex-shrink: 0;
   }
   .client-name { font-size: 16px; font-weight: 700; color: var(--ink); }
   .client-doctor { font-size: 13px; color: var(--muted); margin-top: 2px; }
@@ -235,11 +260,12 @@
     font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
     color: var(--accent); background: var(--accent-light);
     padding: 4px 12px; border-radius: 20px; text-transform: uppercase;
+    white-space: nowrap;
   }
 
-  /* Table */
-  .tbl-wrap { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  /* Table Wrapper for Horizontal Scrolling on Mobile */
+  .tbl-wrap { border-radius: 10px; overflow-x: auto; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 650px; }
   thead tr { background: var(--surface); }
   th {
     padding: 12px 14px; font-size: 10px; font-weight: 700;
@@ -272,6 +298,9 @@
   .work-badge.emax { background: #ecfdf5; color: #065f46; }
   .work-badge.zrf { background: #fff1f2; color: #9f1239; }
   .work-badge.cadf { background: #e0f2fe; color: #075985; }
+  .work-badge.denture { background: #e0e7ff; color: #3730a3; }
+  .work-badge.guard { background: #fae8ff; color: #86198f; }
+  .work-badge.ortho { background: #f0fdf4; color: #166534; }
   .work-badge.old-bal { background: #fef3c7; color: #b45309; }
 
   .empty-state {
@@ -291,6 +320,7 @@
     display: flex; justify-content: space-between; align-items: flex-end;
     padding: 28px 40px 32px;
     border-top: 1px solid var(--border);
+    gap: 20px;
   }
   .footer-clinic-name { font-size: 18px; font-weight: 800; color: var(--ink); letter-spacing: 0.5px; }
   .footer-doctor { font-size: 13px; color: var(--muted); margin-top: 4px; }
@@ -328,10 +358,41 @@
   }
   .pop { animation: popIn 0.4s ease both; }
 
+  /* ── RESPONSIVE MEDIA QUERIES ── */
+  @media (max-width: 820px) {
+    body { flex-direction: column; }
+    .mobile-topbar { display: flex; }
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 200;
+      width: 300px;
+      transform: translateX(-100%);
+      box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 150;
+    }
+    .sidebar-overlay.open { display: block; }
+    .main { padding: 16px; }
+    .stmt-header { padding: 24px 20px; }
+    .lab-name { font-size: 28px; }
+    .stmt-body { padding: 20px 16px; }
+    .client-bar { flex-direction: column; align-items: flex-start; }
+    .stmt-footer { flex-direction: column; align-items: stretch; gap: 20px; padding: 20px 16px; }
+    .totals-area { align-items: stretch; }
+    .total-row.grand { justify-content: space-between; gap: 20px; }
+  }
+
   /* Print */
   @media print {
-    body { background: white; }
-    .sidebar { display: none; }
+    body { background: white; flex-direction: row; }
+    .sidebar, .mobile-topbar, .sidebar-overlay { display: none !important; }
     .main { padding: 0; }
     .statement-card { box-shadow: none; border-radius: 0; }
     .stmt-header { background: #0f172a !important; -webkit-print-color-adjust: exact; }
@@ -341,8 +402,21 @@
 </head>
 <body>
 
+<div class="mobile-topbar">
+  <div class="mobile-brand">
+    <div class="logo-icon">M</div>
+    <span style="font-weight:800; letter-spacing: 1px;">MMDL LAB</span>
+  </div>
+  <button class="btn-toggle-sidebar" onclick="toggleSidebar()">
+    <svg style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    Form &amp; Entry
+  </button>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
 <!-- SIDEBAR -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <div class="logo-badge">
       <div class="logo-icon">M</div>
@@ -377,82 +451,81 @@
     </div>
     <div class="field">
       <label>Teeth No.</label>
-      <input type="text" id="teethNo" placeholder="e.g. 24, 25, 26">
+      <input type="text" id="teethNo" placeholder="e.g. 24, 25, 26" oninput="autoFillPrice()">
     </div>
     <div class="grid-2">
       <div class="field">
         <label>Work Type</label>
-        <select id="workType" name="workType">
-  <option value="">Select Work Type...</option>
+        <select id="workType" name="workType" onchange="autoFillPrice()">
+          <option value="">Select Work Type...</option>
 
-  <!-- 1. FIXED PROSTHODONTICS -->
-  <optgroup label="Fixed - Porcelain Fused to Metal (PFM)">
-    <option value="PFM Standard">PFM Standard</option> <!--650-->
-    <option value="CAD PFM">CAD PFM</option> <!--1250-->
-    <option value="DMLS PFM">DMLS PFM</option> <!--1100-->
-  </optgroup>
+          <!-- 1. FIXED PROSTHODONTICS -->
+          <optgroup label="Fixed - Porcelain Fused to Metal (PFM)">
+            <option value="PFM Standard">PFM Standard</option>
+            <option value="CAD PFM">CAD PFM</option>
+            <option value="DMLS PFM">DMLS PFM</option>
+          </optgroup>
 
-  <optgroup label="Fixed - All-Ceramic / Metal-Free">
-    <option value="ZR(F) Monolithic Classic">Zirconia Full Contour (Monolithic Classic)</option> <!--1450-->
-    <option value="ZR(F) Monolithic Solid">Zirconia Full Contour (Monolithic Solid)</option> <!--1650-->    
-    <option value="ZR(F) Monolithic Solid+">Zirconia Full Contour (Monolithic Solid+)</option> <!--1850-->
-    <option value="ZR(F) Monolithic Premium">Zirconia Full Contour (Monolithic Premium)</option>   <!--2200--> 
-    <option value="ZR Layered">Zirconia Layered</option>
-    <option value="ZR Ultra-Translucent">Zirconia Ultra-Translucent (Anterior)</option>
-    <option value="E-MAX Press">E-Max Press</option>
-    <option value="E-MAX CAD">E-Max CAD</option> <!--350-->
-    <option value="E-MAX Layered">E-Max Layered</option>
-    <option value="Inlay / Onlay">Ceramic Inlay / Onlay</option>
-  </optgroup>
+          <optgroup label="Fixed - All-Ceramic / Metal-Free">
+            <option value="ZR(F) Monolithic Classic">Zirconia Full Contour (Monolithic Classic)</option>
+            <option value="ZR(F) Monolithic Solid">Zirconia Full Contour (Monolithic Solid)</option>
+            <option value="ZR(F) Monolithic Solid+">Zirconia Full Contour (Monolithic Solid+)</option>
+            <option value="ZR(F) Monolithic Premium">Zirconia Full Contour (Monolithic Premium)</option>
+            <option value="ZR Layered">Zirconia Layered</option>
+            <option value="ZR Ultra-Translucent">Zirconia Ultra-Translucent (Anterior)</option>
+            <option value="E-MAX Press">E-Max Press</option>
+            <option value="E-MAX CAD">E-Max CAD</option>
+            <option value="E-MAX Layered">E-Max Layered</option>
+            <option value="Inlay / Onlay">Ceramic Inlay / Onlay</option>
+          </optgroup>
 
-  <optgroup label="Fixed - Full Metal & Provisionals">
-    <option value="FMC">FMC (Full Metal Crown)</option> <!--350-->
-    <option value="CAD FMC">CAD FMC </option>    <!--700-->
-    <option value="PMMA Temporary">PMMA Temporary Crown/Bridge</option> <!--350-->
-    <option value="Acrylic Temporary">Acrylic Temporary</option> <!--150-->
-  </optgroup>
+          <optgroup label="Fixed - Full Metal & Provisionals">
+            <option value="FMC">FMC (Full Metal Crown)</option>
+            <option value="CAD FMC">CAD FMC </option>
+            <option value="PMMA Temporary">PMMA Temporary Crown/Bridge</option>
+            <option value="Acrylic Temporary">Acrylic Temporary</option>
+          </optgroup>
 
-  <!-- 2. REMOVABLE PROSTHODONTICS -->
-  <optgroup label="Removable - Complete Dentures">
-    <option value="CD Normal">Complete Denture (Normal Acrylic)</option> <!--4000-->
-    <option value="CD Stantdard ">Complete Denture Standard</option> <!--5000-->
-    <option value="3D Digital Denture">CAD/CAM 3D Printed Denture</option> 
-    <option value="CD IVO">Complete Denture (IVO)</option> <!--10000-->
-    <option value="CD AR+IVO">Complete Denture (AR+IVO)</option> <!--7000-->
-  </optgroup>
+          <!-- 2. REMOVABLE PROSTHODONTICS -->
+          <optgroup label="Removable - Complete Dentures">
+            <option value="CD Normal">Complete Denture (Normal Acrylic)</option>
+            <option value="CD Stantdard ">Complete Denture Standard</option>
+            <option value="3D Digital Denture">CAD/CAM 3D Printed Denture</option> 
+            <option value="CD IVO">Complete Denture (IVO)</option>
+            <option value="CD AR+IVO">Complete Denture (AR+IVO)</option>
+          </optgroup>
 
-  <optgroup label="Removable - Partial Dentures">
-    <option value="Flexible Denture">Flexible Denture </option>
-    <option value="Acrylic Partial Denture">Acrylic Partial Denture</option> <!--i have one plate and n teeths i need automatic plate rate setter of rs.400 and n*teeth(rs.200) for ex,2 teeths when i select this work type i need to display 800 as total customize only for this worktype -->
-    <option value="Plate + Teeth">Temporary Flipper (1-2 Teeth)</option>
-  </optgroup>
+          <optgroup label="Removable - Partial Dentures">
+            <option value="Flexible Denture">Flexible Denture </option>
+            <option value="Acrylic Partial Denture">Acrylic Partial Denture</option>
+            <option value="Plate + Teeth">Temporary Flipper (1-2 Teeth)</option>
+          </optgroup>
 
-  <optgroup label="Removable - Repairs & Relines">
-    <option value="Denture Reline Hard">Hard Reline</option>
-    <option value="Denture Repair">Denture Repair / Tooth Addition</option> <!--700-->
-  </optgroup>
+          <optgroup label="Removable - Repairs & Relines">
+            <option value="Denture Reline Hard">Hard Reline</option>
+            <option value="Denture Repair">Denture Repair / Tooth Addition</option>
+          </optgroup>
 
+          <!-- 4. GUARDS, SPLINTS & SLEEP -->
+          <optgroup label="Guards & Occlusal Appliances">
+            <option value="Nightguard Hard">Hard Acrylic Nightguard / Splint</option>
+            <option value="Nightguard Soft">Soft Nightguard</option>
+            <option value="Nightguard Dual">Dual-Laminate Guard (Hard/Soft)</option>
+            <option value="Sports Mouthguard">Custom Sports Mouthguard</option>
+            <option value="MAD Sleep Appliance">Mandibular Advancement Device (Sleep Apnea)</option>
+          </optgroup>
 
-  <!-- 4. GUARDS, SPLINTS & SLEEP -->
-  <optgroup label="Guards & Occlusal Appliances">
-    <option value="Nightguard Hard">Hard Acrylic Nightguard / Splint</option> <!--700-->
-    <option value="Nightguard Soft">Soft Nightguard</option> <!--700-->
-    <option value="Nightguard Dual">Dual-Laminate Guard (Hard/Soft)</option> <!--1400-->
-    <option value="Sports Mouthguard">Custom Sports Mouthguard</option> <!--900-->
-    <option value="MAD Sleep Appliance">Mandibular Advancement Device (Sleep Apnea)</option>
-  </optgroup>
-
-  <!-- 5. ORTHODONTICS & SPECIALTY -->
-  <optgroup label="Orthodontics & Guides">
-    <option value="Clear Aligner Set">Clear Aligner (Per Arch/Set)</option> <!--700-->
-    <option value="Hawley Retainer">Hawley Retainer</option> <!--700-->
-    <option value="Essix Retainer">Essix Clear Retainer</option> <!--700-->
-    <option value="Palatal Expander">Rapid Palatal Expander (RPE/Hyrax)</option> <!--700-->
-    <option value="Space Maintainer">Space Maintainer</option> <!--700-->
-    <option value="Special Tray">Custom Impression Tray</option> <!--300-->
-    <option value="Bleaching Tray">Bleaching Tray</option> <!--700-->
-  </optgroup>
-</select>
+          <!-- 5. ORTHODONTICS & SPECIALTY -->
+          <optgroup label="Orthodontics & Guides">
+            <option value="Clear Aligner Set">Clear Aligner (Per Arch/Set)</option>
+            <option value="Hawley Retainer">Hawley Retainer</option>
+            <option value="Essix Retainer">Essix Clear Retainer</option>
+            <option value="Palatal Expander">Rapid Palatal Expander (RPE/Hyrax)</option>
+            <option value="Space Maintainer">Space Maintainer</option>
+            <option value="Special Tray">Custom Impression Tray</option>
+            <option value="Bleaching Tray">Bleaching Tray</option>
+          </optgroup>
+        </select>
       </div>
       <div class="field">
         <label>Unit Price (₹)</label>
@@ -461,7 +534,7 @@
     </div>
     <div class="field">
       <label>Quantity</label>
-      <input type="number" id="quantity" value="1" min="1">
+      <input type="number" id="quantity" value="1" min="1" oninput="autoFillPrice()">
     </div>
     <button class="btn-add" onclick="addRow()">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
@@ -612,7 +685,7 @@ const priceDB = {
 
   // Removable - Complete Dentures
   "CD Normal": 4000,
-  "CD Stantdard ": 5000, // Matches option value space
+  "CD Stantdard ": 5000,
   "CD IVO": 10000,
   "CD AR+IVO": 7000,
 
@@ -666,204 +739,228 @@ const badgeClass = {
   "Special Tray": "ortho",
   "Bleaching Tray": "ortho"
 };
-  let entries = [];
 
-  // Set Today's Date Automatically
-  const today = new Date();
-  document.getElementById('entryDate').valueAsDate = today;
-  document.getElementById('headerDate').textContent = formatIndianDate(today);
+let entries = [];
 
-  // Generate Daily Statement Number
-  const yy = String(today.getFullYear()).slice(-2);
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const randomSuffix = Math.floor(Math.random() * 900 + 100); 
-  document.getElementById('stmtNum').textContent = `${yy}${mm}${dd}-${randomSuffix}`;
+// Set Today's Date Automatically
+const today = new Date();
+document.getElementById('entryDate').valueAsDate = today;
+document.getElementById('headerDate').textContent = formatIndianDate(today);
 
-  function calculateWorkTypePrice(workType, teethCount = 0) {
-  // Custom logic for Acrylic Partial Denture: Base Plate (₹400) + (Teeth Count * ₹200)
-  if (workType === "Acrylic Partial Denture") {
-    const basePlatePrice = 400;
-    const pricePerTooth = 200;
-    const count = parseInt(teethCount, 10) || 0;
-    
-    return basePlatePrice + (count * pricePerTooth);
-  }
+// Generate Daily Statement Number
+const yy = String(today.getFullYear()).slice(-2);
+const mm = String(today.getMonth() + 1).padStart(2, '0');
+const dd = String(today.getDate()).padStart(2, '0');
+const randomSuffix = Math.floor(Math.random() * 900 + 100); 
+document.getElementById('stmtNum').textContent = `${yy}${mm}${dd}-${randomSuffix}`;
 
-  // standard lookup for fixed-price items
-  return priceDB[workType] || 0;
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
 }
 
-  function updateClientDetails() {
-    const c = document.getElementById("clinicInput").value;
-    const d = document.getElementById("doctorInput").value;
-    const initials = c ? c.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0,2) : '?';
+function calculateTeethCount(teethStr) {
+  if (!teethStr) return 0;
+  // Count teeth numbers by splitting on commas, spaces or non-digit groups
+  const teethArray = teethStr.trim().split(/[\s,]+/).filter(t => t.length > 0);
+  return teethArray.length;
+}
 
-    document.getElementById("displayClinicName").textContent = c || "Clinic Name";
-    document.getElementById("displayDoctorName").textContent = d || "Doctor Name";
-    document.getElementById("footerClinic").textContent = c ? c.toUpperCase() : "CLINIC NAME";
-    document.getElementById("footerDoctor").textContent = d || "Doctor Name";
-    document.getElementById("clientAvatar").textContent = initials;
+function autoFillPrice() {
+  const w = document.getElementById("workType").value;
+  const teethStr = document.getElementById("teethNo").value;
+  const unitField = document.getElementById("unitAmount");
+
+  if (w === "Acrylic Partial Denture") {
+    let teethCount = calculateTeethCount(teethStr);
+    if (teethCount === 0) teethCount = 1; // Default fallback to 1 tooth if empty
+    const basePlatePrice = 400;
+    const pricePerTooth = 200;
+    unitField.value = basePlatePrice + (teethCount * pricePerTooth);
+  } else if (priceDB[w] !== undefined) {
+    unitField.value = priceDB[w];
+  }
+}
+
+function updateClientDetails() {
+  const c = document.getElementById("clinicInput").value;
+  const d = document.getElementById("doctorInput").value;
+  const initials = c ? c.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0,2) : '?';
+
+  document.getElementById("displayClinicName").textContent = c || "Clinic Name";
+  document.getElementById("displayDoctorName").textContent = d || "Doctor Name";
+  document.getElementById("footerClinic").textContent = c ? c.toUpperCase() : "CLINIC NAME";
+  document.getElementById("footerDoctor").textContent = d || "Doctor Name";
+  document.getElementById("clientAvatar").textContent = initials;
+}
+
+function formatIndianDate(s) {
+  if (!s) return "—";
+  const d = new Date(s);
+  return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+}
+
+function addRow() {
+  const date   = document.getElementById("entryDate").value;
+  const name   = document.getElementById("patientName").value.trim();
+  const teeth  = document.getElementById("teethNo").value.trim();
+  const work   = document.getElementById("workType").value;
+  const qty    = parseInt(document.getElementById("quantity").value) || 0;
+  const amount = parseFloat(document.getElementById("unitAmount").value) || 0;
+
+  if (!name || qty === 0 || amount === 0) {
+    shakeSidebar(); return;
   }
 
-  function autoFillPrice() {
-    const w = document.getElementById("workType").value;
-    document.getElementById("unitAmount").value = priceDB[w] || "";
+  entries.push({
+    type: 'item',
+    date,
+    name,
+    teeth,
+    work,
+    qty,
+    amount,
+    total: qty * amount
+  });
+
+  renderTable();
+
+  document.getElementById("patientName").value = "";
+  document.getElementById("teethNo").value = "";
+  document.getElementById("quantity").value = "1";
+  document.getElementById("workType").value = "";
+  document.getElementById("unitAmount").value = "";
+  document.getElementById("patientName").focus();
+
+  // Close mobile sidebar after adding entry
+  if (window.innerWidth <= 820) {
+    toggleSidebar();
+  }
+}
+
+function addOldBalance() {
+  const desc = document.getElementById("oldBalDesc").value.trim();
+  const amount = parseFloat(document.getElementById("oldBalAmount").value) || 0;
+
+  if (!desc || amount === 0) {
+    shakeSidebar(); return;
   }
 
-  function formatIndianDate(s) {
-    if (!s) return "—";
-    const d = new Date(s);
-    return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+  entries.push({
+    type: 'oldBalance',
+    date: document.getElementById("entryDate").value,
+    name: desc,
+    teeth: '—',
+    work: 'OLD BAL',
+    qty: 1,
+    amount: amount,
+    total: amount
+  });
+
+  renderTable();
+
+  document.getElementById("oldBalDesc").value = "";
+  document.getElementById("oldBalAmount").value = "";
+
+  if (window.innerWidth <= 820) {
+    toggleSidebar();
   }
+}
 
-  function addRow() {
-    const date   = document.getElementById("entryDate").value;
-    const name   = document.getElementById("patientName").value.trim();
-    const teeth  = document.getElementById("teethNo").value.trim();
-    const work   = document.getElementById("workType").value;
-    const qty    = parseInt(document.getElementById("quantity").value) || 0;
-    const amount = parseFloat(document.getElementById("unitAmount").value) || 0;
+function deleteRow(index) {
+  entries.splice(index, 1);
+  renderTable();
+}
 
-    if (!name || qty === 0 || amount === 0) {
-      shakeSidebar(); return;
-    }
-
-    entries.push({
-      type: 'item',
-      date,
-      name,
-      teeth,
-      work,
-      qty,
-      amount,
-      total: qty * amount
-    });
-
-    renderTable();
-
-    document.getElementById("patientName").value = "";
-    document.getElementById("teethNo").value = "";
-    document.getElementById("quantity").value = "1";
-    document.getElementById("workType").value = "";
-    document.getElementById("unitAmount").value = "";
-    document.getElementById("patientName").focus();
+function editRow(index) {
+  const item = entries[index];
+  if (item.type === 'item') {
+    document.getElementById("entryDate").value = item.date;
+    document.getElementById("patientName").value = item.name;
+    document.getElementById("teethNo").value = item.teeth;
+    document.getElementById("workType").value = item.work;
+    document.getElementById("unitAmount").value = item.amount;
+    document.getElementById("quantity").value = item.qty;
+  } else {
+    document.getElementById("oldBalDesc").value = item.name;
+    document.getElementById("oldBalAmount").value = item.amount;
   }
+  deleteRow(index);
 
-  function addOldBalance() {
-    const desc = document.getElementById("oldBalDesc").value.trim();
-    const amount = parseFloat(document.getElementById("oldBalAmount").value) || 0;
-
-    if (!desc || amount === 0) {
-      shakeSidebar(); return;
-    }
-
-    entries.push({
-      type: 'oldBalance',
-      date: document.getElementById("entryDate").value,
-      name: desc,
-      teeth: '—',
-      work: 'OLD BAL',
-      qty: 1,
-      amount: amount,
-      total: amount
-    });
-
-    renderTable();
-
-    document.getElementById("oldBalDesc").value = "";
-    document.getElementById("oldBalAmount").value = "";
+  if (window.innerWidth <= 820) {
+    toggleSidebar();
   }
+}
 
-  function deleteRow(index) {
-    entries.splice(index, 1);
-    renderTable();
-  }
+function renderTable() {
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
 
-  function editRow(index) {
-    const item = entries[index];
-    if (item.type === 'item') {
-      document.getElementById("entryDate").value = item.date;
-      document.getElementById("patientName").value = item.name;
-      document.getElementById("teethNo").value = item.teeth;
-      document.getElementById("workType").value = item.work;
-      document.getElementById("unitAmount").value = item.amount;
-      document.getElementById("quantity").value = item.qty;
-    } else {
-      document.getElementById("oldBalDesc").value = item.name;
-      document.getElementById("oldBalAmount").value = item.amount;
-    }
-    deleteRow(index);
-  }
-
-  function renderTable() {
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
-
-    if (entries.length === 0) {
-      tbody.innerHTML = `
-        <tr id="emptyRow">
-          <td colspan="9">
-            <div class="empty-state">
-              <div class="empty-icon">🦷</div>
-              <div class="empty-title">No entries yet</div>
-              <div class="empty-sub">Fill in the form and click "Add to Statement"</div>
-            </div>
-          </td>
-        </tr>`;
-      updateTotals(0, 0);
-      return;
-    }
-
-    let totalSum = 0;
-
-    entries.forEach((item, index) => {
-      totalSum += item.total;
-      const tr = document.createElement("tr");
-      const badgeClassAttr = item.type === 'oldBalance' ? 'old-bal' : (badgeClass[item.work] || '');
-
-      tr.innerHTML = `
-        <td><span class="sl-num">${index + 1}</span></td>
-        <td style="color:var(--muted);font-size:12px">${formatIndianDate(item.date)}</td>
-        <td style="font-weight:600">${item.name}</td>
-        <td style="font-size:12px;color:var(--muted)">${item.teeth ? item.teeth.replace(/,/g,', ') : '—'}</td>
-        <td><span class="work-badge ${badgeClassAttr}">${item.work || '—'}</span></td>
-        <td class="num">${item.qty}</td>
-        <td class="num">${item.amount.toLocaleString('en-IN')}</td>
-        <td class="price">₹ ${item.total.toLocaleString('en-IN')}</td>
-        <td class="action-col" style="text-align:center">
-          <button class="btn-action btn-edit" onclick="editRow(${index})">Edit</button>
-          <button class="btn-action btn-delete" onclick="deleteRow(${index})">Del</button>
+  if (entries.length === 0) {
+    tbody.innerHTML = `
+      <tr id="emptyRow">
+        <td colspan="9">
+          <div class="empty-state">
+            <div class="empty-icon">🦷</div>
+            <div class="empty-title">No entries yet</div>
+            <div class="empty-sub">Fill in the form and click "Add to Statement"</div>
+          </div>
         </td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    updateTotals(totalSum, entries.length);
+      </tr>`;
+    updateTotals(0, 0);
+    return;
   }
 
-  function updateTotals(totalSum, count) {
-    document.getElementById("grandTotal").textContent = totalSum.toLocaleString('en-IN');
-    document.getElementById("subtotal").textContent = totalSum.toLocaleString('en-IN');
-    document.getElementById("totalItems").textContent = count;
-    document.getElementById("statEntries").textContent = count;
-    document.getElementById("statTotal").textContent = totalSum.toLocaleString('en-IN');
+  let totalSum = 0;
 
-    document.getElementById("grandTotal").closest('.grand').classList.remove('pop');
-    void document.getElementById("grandTotal").closest('.grand').offsetWidth;
-    document.getElementById("grandTotal").closest('.grand').classList.add('pop');
-  }
+  entries.forEach((item, index) => {
+    totalSum += item.total;
+    const tr = document.createElement("tr");
+    const badgeClassAttr = item.type === 'oldBalance' ? 'old-bal' : (badgeClass[item.work] || '');
 
-  function shakeSidebar() {
-    const s = document.querySelector('.sidebar');
-    s.style.animation = 'none';
-    s.offsetWidth;
-    s.style.animation = 'shake 0.4s ease';
-  }
+    tr.innerHTML = `
+      <td><span class="sl-num">${index + 1}</span></td>
+      <td style="color:var(--muted);font-size:12px">${formatIndianDate(item.date)}</td>
+      <td style="font-weight:600">${item.name}</td>
+      <td style="font-size:12px;color:var(--muted)">${item.teeth ? item.teeth.replace(/,/g,', ') : '—'}</td>
+      <td><span class="work-badge ${badgeClassAttr}">${item.work || '—'}</span></td>
+      <td class="num">${item.qty}</td>
+      <td class="num">${item.amount.toLocaleString('en-IN')}</td>
+      <td class="price">₹ ${item.total.toLocaleString('en-IN')}</td>
+      <td class="action-col" style="text-align:center">
+        <button class="btn-action btn-edit" onclick="editRow(${index})">Edit</button>
+        <button class="btn-action btn-delete" onclick="deleteRow(${index})">Del</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
 
-  const shakeCSS = document.createElement('style');
-  shakeCSS.textContent = `@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}`;
-  document.head.appendChild(shakeCSS);
+  updateTotals(totalSum, entries.length);
+}
+
+function updateTotals(totalSum, count) {
+  document.getElementById("grandTotal").textContent = totalSum.toLocaleString('en-IN');
+  document.getElementById("subtotal").textContent = totalSum.toLocaleString('en-IN');
+  document.getElementById("totalItems").textContent = count;
+  document.getElementById("statEntries").textContent = count;
+  document.getElementById("statTotal").textContent = totalSum.toLocaleString('en-IN');
+
+  const grandElement = document.getElementById("grandTotal").closest('.grand');
+  grandElement.classList.remove('pop');
+  void grandElement.offsetWidth;
+  grandElement.classList.add('pop');
+}
+
+function shakeSidebar() {
+  const s = document.querySelector('.sidebar');
+  s.style.animation = 'none';
+  s.offsetWidth;
+  s.style.animation = 'shake 0.4s ease';
+}
+
+const shakeCSS = document.createElement('style');
+shakeCSS.textContent = `@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}`;
+document.head.appendChild(shakeCSS);
 </script>
 </body>
 </html>

@@ -301,7 +301,37 @@
   .work-badge.denture { background: #e0e7ff; color: #3730a3; }
   .work-badge.guard { background: #fae8ff; color: #86198f; }
   .work-badge.ortho { background: #f0fdf4; color: #166534; }
-  .work-badge.old-bal { background: #fef3c7; color: #b45309; }
+
+  /* ── OLD BALANCE SEPARATE SECTION ── */
+  .old-bal-wrapper {
+    margin-top: 24px;
+    border: 1px solid #fef3c7;
+    background: #fffbeb;
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .old-bal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #b45309;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .old-bal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #fde68a;
+  }
+  .old-bal-item:last-child { border-bottom: none; }
+  .old-bal-desc { font-weight: 600; color: #78350f; font-size: 13px; }
+  .old-bal-right { display: flex; align-items: center; gap: 16px; }
+  .old-bal-amount { font-weight: 700; color: #92400e; font-size: 14px; }
 
   .empty-state {
     text-align: center; padding: 56px 24px; color: var(--muted);
@@ -451,7 +481,7 @@
     </div>
     <div class="field">
       <label>Teeth No.</label>
-      <input type="text" id="teethNo" placeholder="e.g. 24, 25, 26" oninput="autoFillPrice()">
+      <input type="text" id="teethNo" placeholder="e.g. 24, 25, 26" oninput="onTeethInputChange()">
     </div>
     <div class="grid-2">
       <div class="field">
@@ -460,7 +490,7 @@
           <option value="">Select Work Type...</option>
 
           <!-- 1. FIXED PROSTHODONTICS -->
-          <optgroup style="color: tomato;" label="Fixed - Porcelain Fused to Metal (PFM)">
+          <optgroup label="Fixed - Porcelain Fused to Metal (PFM)">
             <option value="PFM Standard">PFM Standard</option>
             <option value="CAD PFM">CAD PFM</option>
             <option value="DMLS PFM">DMLS PFM</option>
@@ -533,7 +563,7 @@
       </div>
     </div>
     <div class="field">
-      <label>Quantity</label>
+      <label id="qtyLabel">Quantity / Teeth Count</label>
       <input type="number" id="quantity" value="1" min="1" oninput="autoFillPrice()">
     </div>
     <button class="btn-add" onclick="addRow()">
@@ -614,7 +644,7 @@
             <tr>
               <th style="width:48px">Sl.</th>
               <th>Date</th>
-              <th>Patient / Desc</th>
+              <th>Patient Name</th>
               <th>Teeth No.</th>
               <th>Work</th>
               <th style="text-align:center">Qty</th>
@@ -628,7 +658,7 @@
               <td colspan="9">
                 <div class="empty-state">
                   <div class="empty-icon">🦷</div>
-                  <div class="empty-title">No entries yet</div>
+                  <div class="empty-title">No patient entries yet</div>
                   <div class="empty-sub">Fill in the form and click "Add to Statement"</div>
                 </div>
               </td>
@@ -636,6 +666,16 @@
           </tbody>
         </table>
       </div>
+
+      <!-- SEPARATE OLD BALANCE SECTION -->
+      <div class="old-bal-wrapper" id="oldBalWrapper" style="display: none;">
+        <div class="old-bal-header">
+          <svg style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Old Balance / Previous Dues
+        </div>
+        <div id="oldBalContainer"></div>
+      </div>
+
     </div>
 
     <div class="stmt-footer">
@@ -664,14 +704,10 @@
 </div>
 
 <script>
-// COMPLETE MAPPING OF ALL OPTION VALUES TO PRICES
 const priceDB = {
-  // Fixed - PFM
   "PFM Standard": 650,
   "CAD PFM": 1250,
   "DMLS PFM": 1100,
-
-  // Fixed - All-Ceramic / Metal-Free
   "ZR(F) Monolithic Classic": 1450,
   "ZR(F) Monolithic Solid": 1650,
   "ZR(F) Monolithic Solid+": 1850,
@@ -682,36 +718,24 @@ const priceDB = {
   "E-MAX CAD": 350,
   "E-MAX Layered": 2200,
   "Inlay / Onlay": 1200,
-
-  // Fixed - Full Metal & Provisionals
   "FMC": 350,
   "CAD FMC": 700,
   "PMMA Temporary": 350,
   "Acrylic Temporary": 150,
-
-  // Removable - Complete Dentures
   "CD Normal": 4000,
   "CD Standard": 5000,
   "3D Digital Denture": 6000,
   "CD IVO": 10000,
   "CD AR+IVO": 7000,
-
-  // Removable - Partial Dentures
   "Flexible Denture": 3000,
   "Plate + Teeth": 500,
-
-  // Removable - Repairs & Relines
   "Denture Reline Hard": 800,
   "Denture Repair": 700,
-
-  // Guards & Occlusal Appliances
   "Nightguard Hard": 700,
   "Nightguard Soft": 700,
   "Nightguard Dual": 1400,
   "Sports Mouthguard": 900,
   "MAD Sleep Appliance": 3500,
-
-  // Orthodontics & Specialty
   "Clear Aligner Set": 700,
   "Hawley Retainer": 700,
   "Essix Retainer": 700,
@@ -764,6 +788,7 @@ const badgeClass = {
 };
 
 let entries = [];
+let oldBalances = [];
 
 // Set Today's Date Automatically
 const today = new Date();
@@ -784,15 +809,26 @@ function toggleSidebar() {
 
 function calculateTeethCount(teethStr) {
   if (!teethStr) return 0;
-  // Count teeth numbers by splitting on commas, spaces or non-digit groups
   const teethArray = teethStr.trim().split(/[\s,]+/).filter(t => t.length > 0);
   return teethArray.length;
 }
 
+function onTeethInputChange() {
+  const w = document.getElementById("workType").value;
+  if (w === "Acrylic Partial Denture") {
+    const teethStr = document.getElementById("teethNo").value;
+    const teethCount = calculateTeethCount(teethStr);
+    if (teethCount > 0) {
+      document.getElementById("quantity").value = teethCount;
+    }
+  }
+  autoFillPrice();
+}
+
 function autoFillPrice() {
   const w = document.getElementById("workType").value;
-  const teethStr = document.getElementById("teethNo").value;
   const unitField = document.getElementById("unitAmount");
+  const qtyField = document.getElementById("quantity");
 
   if (!w) {
     unitField.value = "";
@@ -800,10 +836,11 @@ function autoFillPrice() {
   }
 
   if (w === "Acrylic Partial Denture") {
-    let teethCount = calculateTeethCount(teethStr);
-    if (teethCount === 0) teethCount = 1; // Default fallback to 1 tooth if empty
+    const teethCount = parseInt(qtyField.value, 10) || 0;
     const basePlatePrice = 400;
     const pricePerTooth = 200;
+    
+    // Total cost for 1 Acrylic Partial Denture plate with N teeth
     unitField.value = basePlatePrice + (teethCount * pricePerTooth);
   } else if (priceDB[w] !== undefined) {
     unitField.value = priceDB[w];
@@ -838,19 +875,21 @@ function addRow() {
   const qty    = parseInt(document.getElementById("quantity").value) || 0;
   const amount = parseFloat(document.getElementById("unitAmount").value) || 0;
 
-  if (!name || qty === 0 || amount === 0) {
+  if (!name || amount === 0) {
     shakeSidebar(); return;
   }
 
+  // Calculate total: If Acrylic Partial Denture, total is flat amount (₹400 plate + teeth * 200)
+  const calculatedTotal = (work === "Acrylic Partial Denture") ? amount : (qty * amount);
+
   entries.push({
-    type: 'item',
     date,
     name,
     teeth,
     work,
     qty,
     amount,
-    total: qty * amount
+    total: calculatedTotal
   });
 
   renderTable();
@@ -862,7 +901,6 @@ function addRow() {
   document.getElementById("unitAmount").value = "";
   document.getElementById("patientName").focus();
 
-  // Close mobile sidebar after adding entry
   if (window.innerWidth <= 820) {
     toggleSidebar();
   }
@@ -876,15 +914,9 @@ function addOldBalance() {
     shakeSidebar(); return;
   }
 
-  entries.push({
-    type: 'oldBalance',
-    date: document.getElementById("entryDate").value,
-    name: desc,
-    teeth: '—',
-    work: 'OLD BAL',
-    qty: 1,
-    amount: amount,
-    total: amount
+  oldBalances.push({
+    desc,
+    amount
   });
 
   renderTable();
@@ -902,20 +934,33 @@ function deleteRow(index) {
   renderTable();
 }
 
+function deleteOldBal(index) {
+  oldBalances.splice(index, 1);
+  renderTable();
+}
+
 function editRow(index) {
   const item = entries[index];
-  if (item.type === 'item') {
-    document.getElementById("entryDate").value = item.date;
-    document.getElementById("patientName").value = item.name;
-    document.getElementById("teethNo").value = item.teeth;
-    document.getElementById("workType").value = item.work;
-    document.getElementById("unitAmount").value = item.amount;
-    document.getElementById("quantity").value = item.qty;
-  } else {
-    document.getElementById("oldBalDesc").value = item.name;
-    document.getElementById("oldBalAmount").value = item.amount;
-  }
+  document.getElementById("entryDate").value = item.date;
+  document.getElementById("patientName").value = item.name;
+  document.getElementById("teethNo").value = item.teeth;
+  document.getElementById("workType").value = item.work;
+  document.getElementById("quantity").value = item.qty;
+  document.getElementById("unitAmount").value = item.amount;
+  
   deleteRow(index);
+
+  if (window.innerWidth <= 820) {
+    toggleSidebar();
+  }
+}
+
+function editOldBal(index) {
+  const item = oldBalances[index];
+  document.getElementById("oldBalDesc").value = item.desc;
+  document.getElementById("oldBalAmount").value = item.amount;
+
+  deleteOldBal(index);
 
   if (window.innerWidth <= 820) {
     toggleSidebar();
@@ -926,46 +971,71 @@ function renderTable() {
   const tbody = document.getElementById("tableBody");
   tbody.innerHTML = "";
 
+  let totalSum = 0;
+
   if (entries.length === 0) {
     tbody.innerHTML = `
       <tr id="emptyRow">
         <td colspan="9">
           <div class="empty-state">
             <div class="empty-icon">🦷</div>
-            <div class="empty-title">No entries yet</div>
+            <div class="empty-title">No patient entries yet</div>
             <div class="empty-sub">Fill in the form and click "Add to Statement"</div>
           </div>
         </td>
       </tr>`;
-    updateTotals(0, 0);
-    return;
+  } else {
+    entries.forEach((item, index) => {
+      totalSum += item.total;
+      const tr = document.createElement("tr");
+      const badgeClassAttr = badgeClass[item.work] || '';
+
+      tr.innerHTML = `
+        <td><span class="sl-num">${index + 1}</span></td>
+        <td style="color:var(--muted);font-size:12px">${formatIndianDate(item.date)}</td>
+        <td style="font-weight:600">${item.name}</td>
+        <td style="font-size:12px;color:var(--muted)">${item.teeth ? item.teeth.replace(/,/g,', ') : '—'}</td>
+        <td><span class="work-badge ${badgeClassAttr}">${item.work || '—'}</span></td>
+        <td class="num">${item.qty}</td>
+        <td class="num">${item.amount.toLocaleString('en-IN')}</td>
+        <td class="price">₹ ${item.total.toLocaleString('en-IN')}</td>
+        <td class="action-col" style="text-align:center">
+          <button class="btn-action btn-edit" onclick="editRow(${index})">Edit</button>
+          <button class="btn-action btn-delete" onclick="deleteRow(${index})">Del</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
   }
 
-  let totalSum = 0;
+  // Render Old Balance Section
+  const oldBalWrapper = document.getElementById("oldBalWrapper");
+  const oldBalContainer = document.getElementById("oldBalContainer");
+  oldBalContainer.innerHTML = "";
 
-  entries.forEach((item, index) => {
-    totalSum += item.total;
-    const tr = document.createElement("tr");
-    const badgeClassAttr = item.type === 'oldBalance' ? 'old-bal' : (badgeClass[item.work] || '');
+  if (oldBalances.length > 0) {
+    oldBalWrapper.style.display = "block";
+    oldBalances.forEach((item, index) => {
+      totalSum += item.amount;
+      const div = document.createElement("div");
+      div.className = "old-bal-item";
+      div.innerHTML = `
+        <div class="old-bal-desc">${item.desc}</div>
+        <div class="old-bal-right">
+          <div class="old-bal-amount">₹ ${item.amount.toLocaleString('en-IN')}</div>
+          <div class="action-col">
+            <button class="btn-action btn-edit" onclick="editOldBal(${index})">Edit</button>
+            <button class="btn-action btn-delete" onclick="deleteOldBal(${index})">Del</button>
+          </div>
+        </div>
+      `;
+      oldBalContainer.appendChild(div);
+    });
+  } else {
+    oldBalWrapper.style.display = "none";
+  }
 
-    tr.innerHTML = `
-      <td><span class="sl-num">${index + 1}</span></td>
-      <td style="color:var(--muted);font-size:12px">${formatIndianDate(item.date)}</td>
-      <td style="font-weight:600">${item.name}</td>
-      <td style="font-size:12px;color:var(--muted)">${item.teeth ? item.teeth.replace(/,/g,', ') : '—'}</td>
-      <td><span class="work-badge ${badgeClassAttr}">${item.work || '—'}</span></td>
-      <td class="num">${item.qty}</td>
-      <td class="num">${item.amount.toLocaleString('en-IN')}</td>
-      <td class="price">₹ ${item.total.toLocaleString('en-IN')}</td>
-      <td class="action-col" style="text-align:center">
-        <button class="btn-action btn-edit" onclick="editRow(${index})">Edit</button>
-        <button class="btn-action btn-delete" onclick="deleteRow(${index})">Del</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  updateTotals(totalSum, entries.length);
+  updateTotals(totalSum, entries.length + oldBalances.length);
 }
 
 function updateTotals(totalSum, count) {

@@ -481,7 +481,7 @@
 
           <optgroup label="Fixed - Full Metal & Provisionals">
             <option value="FMC">FMC (Full Metal Crown)</option>
-            <option value="CAD FMC">CAD FMC </option>
+            <option value="CAD FMC">CAD FMC</option>
             <option value="PMMA Temporary">PMMA Temporary Crown/Bridge</option>
             <option value="Acrylic Temporary">Acrylic Temporary</option>
           </optgroup>
@@ -489,14 +489,14 @@
           <!-- 2. REMOVABLE PROSTHODONTICS -->
           <optgroup label="Removable - Complete Dentures">
             <option value="CD Normal">Complete Denture (Normal Acrylic)</option>
-            <option value="CD Stantdard ">Complete Denture Standard</option>
+            <option value="CD Standard">Complete Denture Standard</option>
             <option value="3D Digital Denture">CAD/CAM 3D Printed Denture</option> 
             <option value="CD IVO">Complete Denture (IVO)</option>
             <option value="CD AR+IVO">Complete Denture (AR+IVO)</option>
           </optgroup>
 
           <optgroup label="Removable - Partial Dentures">
-            <option value="Flexible Denture">Flexible Denture </option>
+            <option value="Flexible Denture">Flexible Denture</option>
             <option value="Acrylic Partial Denture">Acrylic Partial Denture</option>
             <option value="Plate + Teeth">Temporary Flipper (1-2 Teeth)</option>
           </optgroup>
@@ -664,6 +664,7 @@
 </div>
 
 <script>
+// COMPLETE MAPPING OF ALL OPTION VALUES TO PRICES
 const priceDB = {
   // Fixed - PFM
   "PFM Standard": 650,
@@ -675,7 +676,12 @@ const priceDB = {
   "ZR(F) Monolithic Solid": 1650,
   "ZR(F) Monolithic Solid+": 1850,
   "ZR(F) Monolithic Premium": 2200,
+  "ZR Layered": 2000,
+  "ZR Ultra-Translucent": 2200,
+  "E-MAX Press": 1800,
   "E-MAX CAD": 350,
+  "E-MAX Layered": 2200,
+  "Inlay / Onlay": 1200,
 
   // Fixed - Full Metal & Provisionals
   "FMC": 350,
@@ -685,11 +691,17 @@ const priceDB = {
 
   // Removable - Complete Dentures
   "CD Normal": 4000,
-  "CD Stantdard ": 5000,
+  "CD Standard": 5000,
+  "3D Digital Denture": 6000,
   "CD IVO": 10000,
   "CD AR+IVO": 7000,
 
+  // Removable - Partial Dentures
+  "Flexible Denture": 3000,
+  "Plate + Teeth": 500,
+
   // Removable - Repairs & Relines
+  "Denture Reline Hard": 800,
   "Denture Repair": 700,
 
   // Guards & Occlusal Appliances
@@ -697,6 +709,7 @@ const priceDB = {
   "Nightguard Soft": 700,
   "Nightguard Dual": 1400,
   "Sports Mouthguard": 900,
+  "MAD Sleep Appliance": 3500,
 
   // Orthodontics & Specialty
   "Clear Aligner Set": 700,
@@ -716,21 +729,31 @@ const badgeClass = {
   "ZR(F) Monolithic Solid": "zrf",
   "ZR(F) Monolithic Solid+": "zrf",
   "ZR(F) Monolithic Premium": "zrf",
+  "ZR Layered": "zrf",
+  "ZR Ultra-Translucent": "zrf",
+  "E-MAX Press": "emax",
   "E-MAX CAD": "emax",
+  "E-MAX Layered": "emax",
+  "Inlay / Onlay": "emax",
   "FMC": "fmc",
   "CAD FMC": "fmc",
-  "PMMA Temporary": "temp",
-  "Acrylic Temporary": "temp",
+  "PMMA Temporary": "cadf",
+  "Acrylic Temporary": "cadf",
   "CD Normal": "denture",
-  "CD Stantdard ": "denture",
+  "CD Standard": "denture",
+  "3D Digital Denture": "denture",
   "CD IVO": "denture",
   "CD AR+IVO": "denture",
+  "Flexible Denture": "denture",
   "Acrylic Partial Denture": "denture",
+  "Plate + Teeth": "denture",
+  "Denture Reline Hard": "denture",
   "Denture Repair": "denture",
   "Nightguard Hard": "guard",
   "Nightguard Soft": "guard",
   "Nightguard Dual": "guard",
   "Sports Mouthguard": "guard",
+  "MAD Sleep Appliance": "guard",
   "Clear Aligner Set": "ortho",
   "Hawley Retainer": "ortho",
   "Essix Retainer": "ortho",
@@ -771,6 +794,11 @@ function autoFillPrice() {
   const teethStr = document.getElementById("teethNo").value;
   const unitField = document.getElementById("unitAmount");
 
+  if (!w) {
+    unitField.value = "";
+    return;
+  }
+
   if (w === "Acrylic Partial Denture") {
     let teethCount = calculateTeethCount(teethStr);
     if (teethCount === 0) teethCount = 1; // Default fallback to 1 tooth if empty
@@ -779,6 +807,8 @@ function autoFillPrice() {
     unitField.value = basePlatePrice + (teethCount * pricePerTooth);
   } else if (priceDB[w] !== undefined) {
     unitField.value = priceDB[w];
+  } else {
+    unitField.value = "";
   }
 }
 

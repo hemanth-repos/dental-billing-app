@@ -107,6 +107,11 @@
   .btn-add:active { transform: scale(0.98); }
   .btn-add svg { width: 16px; height: 16px; }
 
+  .btn-add-alt {
+    background: #d97706;
+  }
+  .btn-add-alt:hover { background: #b45309; }
+
   .btn-print {
     margin: 16px 24px 24px;
     padding: 13px;
@@ -130,6 +135,22 @@
   .stat-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
   .stat-val { font-size: 18px; font-weight: 700; color: white; }
   .stat-val.accent { color: #60a5fa; }
+
+  /* Action Buttons in Table */
+  .btn-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-edit { color: #3b82f6; }
+  .btn-edit:hover { background: rgba(59,130,246,0.1); }
+  .btn-delete { color: #dc2626; }
+  .btn-delete:hover { background: rgba(220,38,38,0.1); }
 
   /* ── MAIN PANEL ── */
   .main {
@@ -251,6 +272,7 @@
   .work-badge.emax { background: #ecfdf5; color: #065f46; }
   .work-badge.zrf { background: #fff1f2; color: #9f1239; }
   .work-badge.cadf { background: #e0f2fe; color: #075985; }
+  .work-badge.old-bal { background: #fef3c7; color: #b45309; }
 
   .empty-state {
     text-align: center; padding: 56px 24px; color: var(--muted);
@@ -270,7 +292,6 @@
     padding: 28px 40px 32px;
     border-top: 1px solid var(--border);
   }
-  .footer-clinic { }
   .footer-clinic-name { font-size: 18px; font-weight: 800; color: var(--ink); letter-spacing: 0.5px; }
   .footer-doctor { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
@@ -314,7 +335,7 @@
     .main { padding: 0; }
     .statement-card { box-shadow: none; border-radius: 0; }
     .stmt-header { background: #0f172a !important; -webkit-print-color-adjust: exact; }
-    .btn-print, .btn-add { display: none; }
+    .btn-print, .btn-add, .action-col { display: none; }
   }
 </style>
 </head>
@@ -386,6 +407,22 @@
   </div>
 
   <div class="sidebar-section">
+    <div class="section-label">Add Old Balance</div>
+    <div class="field">
+      <label>Description</label>
+      <input type="text" id="oldBalDesc" placeholder="e.g. December Old Balance">
+    </div>
+    <div class="field">
+      <label>Amount (₹)</label>
+      <input type="number" id="oldBalAmount" placeholder="0">
+    </div>
+    <button class="btn-add btn-add-alt" onclick="addOldBalance()">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Add Old Balance
+    </button>
+  </div>
+
+  <div class="sidebar-section">
     <div class="section-label">Summary</div>
     <div class="stat-row">
       <div class="stat-card">
@@ -441,17 +478,18 @@
             <tr>
               <th style="width:48px">Sl.</th>
               <th>Date</th>
-              <th>Patient</th>
+              <th>Patient / Desc</th>
               <th>Teeth No.</th>
               <th>Work</th>
               <th style="text-align:center">Qty</th>
               <th style="text-align:right">Unit (₹)</th>
               <th style="text-align:right">Price (₹)</th>
+              <th class="action-col" style="text-align:center; width:80px">Actions</th>
             </tr>
           </thead>
           <tbody id="tableBody">
             <tr id="emptyRow">
-              <td colspan="8">
+              <td colspan="9">
                 <div class="empty-state">
                   <div class="empty-icon">🦷</div>
                   <div class="empty-title">No entries yet</div>
@@ -492,19 +530,18 @@
 <script>
   const priceDB = { "PFM": 650, "ZR(F)": 1650, "CAD MC": 350, "FMC": 500, "E-MAX": 2000 };
   const badgeClass = { "PFM": "pfm", "ZR(F)": "zrf", "CAD MC": "cadf", "FMC": "fmc", "E-MAX": "emax" };
-  let serial = 1, totalSum = 0, entryCount = 0;
+  let entries = [];
 
-  // 1. Set Today's Date Automatically
+  // Set Today's Date Automatically
   const today = new Date();
   document.getElementById('entryDate').valueAsDate = today;
   document.getElementById('headerDate').textContent = formatIndianDate(today);
 
-  // 2. Generate a Daily Statement Number (Format: YYMMDD-RandomSuffix)
+  // Generate Daily Statement Number
   const yy = String(today.getFullYear()).slice(-2);
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
   const randomSuffix = Math.floor(Math.random() * 900 + 100); 
-  
   document.getElementById('stmtNum').textContent = `${yy}${mm}${dd}-${randomSuffix}`;
 
   function updateClientDetails() {
@@ -542,44 +579,129 @@
       shakeSidebar(); return;
     }
 
-    const rowPrice = qty * amount;
-    totalSum += rowPrice;
-    entryCount++;
+    entries.push({
+      type: 'item',
+      date,
+      name,
+      teeth,
+      work,
+      qty,
+      amount,
+      total: qty * amount
+    });
 
-    const empty = document.getElementById("emptyRow");
-    if (empty) empty.remove();
+    renderTable();
 
-    const tbody = document.getElementById("tableBody");
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><span class="sl-num">${serial}</span></td>
-      <td style="color:var(--muted);font-size:12px">${formatIndianDate(date)}</td>
-      <td style="font-weight:600">${name}</td>
-      <td style="font-size:12px;color:var(--muted)">${teeth.replace(/,/g,', ') || '—'}</td>
-      <td><span class="work-badge ${badgeClass[work]||''}">${work||'—'}</span></td>
-      <td class="num">${qty}</td>
-      <td class="num">${amount.toLocaleString('en-IN')}</td>
-      <td class="price">₹ ${rowPrice.toLocaleString('en-IN')}</td>
-    `;
-    tbody.appendChild(tr);
-
-    document.getElementById("grandTotal").textContent = totalSum.toLocaleString('en-IN');
-    document.getElementById("grandTotal").closest('.grand').classList.remove('pop');
-    void document.getElementById("grandTotal").closest('.grand').offsetWidth;
-    document.getElementById("grandTotal").closest('.grand').classList.add('pop');
-
-    document.getElementById("subtotal").textContent = totalSum.toLocaleString('en-IN');
-    document.getElementById("totalItems").textContent = entryCount;
-    document.getElementById("statEntries").textContent = entryCount;
-    document.getElementById("statTotal").textContent = totalSum.toLocaleString('en-IN');
-
-    serial++;
     document.getElementById("patientName").value = "";
     document.getElementById("teethNo").value = "";
     document.getElementById("quantity").value = "1";
     document.getElementById("workType").value = "";
     document.getElementById("unitAmount").value = "";
     document.getElementById("patientName").focus();
+  }
+
+  function addOldBalance() {
+    const desc = document.getElementById("oldBalDesc").value.trim();
+    const amount = parseFloat(document.getElementById("oldBalAmount").value) || 0;
+
+    if (!desc || amount === 0) {
+      shakeSidebar(); return;
+    }
+
+    entries.push({
+      type: 'oldBalance',
+      date: document.getElementById("entryDate").value,
+      name: desc,
+      teeth: '—',
+      work: 'OLD BAL',
+      qty: 1,
+      amount: amount,
+      total: amount
+    });
+
+    renderTable();
+
+    document.getElementById("oldBalDesc").value = "";
+    document.getElementById("oldBalAmount").value = "";
+  }
+
+  function deleteRow(index) {
+    entries.splice(index, 1);
+    renderTable();
+  }
+
+  function editRow(index) {
+    const item = entries[index];
+    if (item.type === 'item') {
+      document.getElementById("entryDate").value = item.date;
+      document.getElementById("patientName").value = item.name;
+      document.getElementById("teethNo").value = item.teeth;
+      document.getElementById("workType").value = item.work;
+      document.getElementById("unitAmount").value = item.amount;
+      document.getElementById("quantity").value = item.qty;
+    } else {
+      document.getElementById("oldBalDesc").value = item.name;
+      document.getElementById("oldBalAmount").value = item.amount;
+    }
+    deleteRow(index);
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    if (entries.length === 0) {
+      tbody.innerHTML = `
+        <tr id="emptyRow">
+          <td colspan="9">
+            <div class="empty-state">
+              <div class="empty-icon">🦷</div>
+              <div class="empty-title">No entries yet</div>
+              <div class="empty-sub">Fill in the form and click "Add to Statement"</div>
+            </div>
+          </td>
+        </tr>`;
+      updateTotals(0, 0);
+      return;
+    }
+
+    let totalSum = 0;
+
+    entries.forEach((item, index) => {
+      totalSum += item.total;
+      const tr = document.createElement("tr");
+      const badgeClassAttr = item.type === 'oldBalance' ? 'old-bal' : (badgeClass[item.work] || '');
+
+      tr.innerHTML = `
+        <td><span class="sl-num">${index + 1}</span></td>
+        <td style="color:var(--muted);font-size:12px">${formatIndianDate(item.date)}</td>
+        <td style="font-weight:600">${item.name}</td>
+        <td style="font-size:12px;color:var(--muted)">${item.teeth ? item.teeth.replace(/,/g,', ') : '—'}</td>
+        <td><span class="work-badge ${badgeClassAttr}">${item.work || '—'}</span></td>
+        <td class="num">${item.qty}</td>
+        <td class="num">${item.amount.toLocaleString('en-IN')}</td>
+        <td class="price">₹ ${item.total.toLocaleString('en-IN')}</td>
+        <td class="action-col" style="text-align:center">
+          <button class="btn-action btn-edit" onclick="editRow(${index})">Edit</button>
+          <button class="btn-action btn-delete" onclick="deleteRow(${index})">Del</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    updateTotals(totalSum, entries.length);
+  }
+
+  function updateTotals(totalSum, count) {
+    document.getElementById("grandTotal").textContent = totalSum.toLocaleString('en-IN');
+    document.getElementById("subtotal").textContent = totalSum.toLocaleString('en-IN');
+    document.getElementById("totalItems").textContent = count;
+    document.getElementById("statEntries").textContent = count;
+    document.getElementById("statTotal").textContent = totalSum.toLocaleString('en-IN');
+
+    document.getElementById("grandTotal").closest('.grand').classList.remove('pop');
+    void document.getElementById("grandTotal").closest('.grand').offsetWidth;
+    document.getElementById("grandTotal").closest('.grand').classList.add('pop');
   }
 
   function shakeSidebar() {

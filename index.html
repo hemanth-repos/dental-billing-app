@@ -481,7 +481,7 @@
     </div>
     <div class="field">
       <label>Teeth No.</label>
-      <input type="text" id="teethNo" placeholder="e.g. 24, 25, 26" oninput="onTeethInputChange()">
+      <input type="text" id="teethNo" placeholder="e.g. 24, 25, 26" oninput="autoFillPrice()">
     </div>
     <div class="grid-2">
       <div class="field">
@@ -563,7 +563,7 @@
       </div>
     </div>
     <div class="field">
-      <label id="qtyLabel">Quantity / Teeth Count</label>
+      <label>Quantity</label>
       <input type="number" id="quantity" value="1" min="1" oninput="autoFillPrice()">
     </div>
     <button class="btn-add" onclick="addRow()">
@@ -658,7 +658,7 @@
               <td colspan="9">
                 <div class="empty-state">
                   <div class="empty-icon">🦷</div>
-                  <div class="empty-title">No patient entries yet</div>
+                  <div class="empty-title">No entries yet</div>
                   <div class="empty-sub">Fill in the form and click "Add to Statement"</div>
                 </div>
               </td>
@@ -813,22 +813,10 @@ function calculateTeethCount(teethStr) {
   return teethArray.length;
 }
 
-function onTeethInputChange() {
-  const w = document.getElementById("workType").value;
-  if (w === "Acrylic Partial Denture") {
-    const teethStr = document.getElementById("teethNo").value;
-    const teethCount = calculateTeethCount(teethStr);
-    if (teethCount > 0) {
-      document.getElementById("quantity").value = teethCount;
-    }
-  }
-  autoFillPrice();
-}
-
 function autoFillPrice() {
   const w = document.getElementById("workType").value;
+  const teethStr = document.getElementById("teethNo").value;
   const unitField = document.getElementById("unitAmount");
-  const qtyField = document.getElementById("quantity");
 
   if (!w) {
     unitField.value = "";
@@ -836,11 +824,10 @@ function autoFillPrice() {
   }
 
   if (w === "Acrylic Partial Denture") {
-    const teethCount = parseInt(qtyField.value, 10) || 0;
+    let teethCount = calculateTeethCount(teethStr);
+    if (teethCount === 0) teethCount = 1;
     const basePlatePrice = 400;
     const pricePerTooth = 200;
-    
-    // Total cost for 1 Acrylic Partial Denture plate with N teeth
     unitField.value = basePlatePrice + (teethCount * pricePerTooth);
   } else if (priceDB[w] !== undefined) {
     unitField.value = priceDB[w];
@@ -875,12 +862,9 @@ function addRow() {
   const qty    = parseInt(document.getElementById("quantity").value) || 0;
   const amount = parseFloat(document.getElementById("unitAmount").value) || 0;
 
-  if (!name || amount === 0) {
+  if (!name || qty === 0 || amount === 0) {
     shakeSidebar(); return;
   }
-
-  // Calculate total: If Acrylic Partial Denture, total is flat amount (₹400 plate + teeth * 200)
-  const calculatedTotal = (work === "Acrylic Partial Denture") ? amount : (qty * amount);
 
   entries.push({
     date,
@@ -889,7 +873,7 @@ function addRow() {
     work,
     qty,
     amount,
-    total: calculatedTotal
+    total: qty * amount
   });
 
   renderTable();
@@ -945,8 +929,8 @@ function editRow(index) {
   document.getElementById("patientName").value = item.name;
   document.getElementById("teethNo").value = item.teeth;
   document.getElementById("workType").value = item.work;
-  document.getElementById("quantity").value = item.qty;
   document.getElementById("unitAmount").value = item.amount;
+  document.getElementById("quantity").value = item.qty;
   
   deleteRow(index);
 

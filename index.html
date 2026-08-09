@@ -670,8 +670,7 @@
       <!-- SEPARATE OLD BALANCE SECTION -->
       <div class="old-bal-wrapper" id="oldBalWrapper" style="display: none;">
         <div class="old-bal-header">
-          <svg style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Old Balance / Previous Dues
+           Previous Dues/Extra Charges
         </div>
         <div id="oldBalContainer"></div>
       </div>
@@ -824,10 +823,11 @@ function autoFillPrice() {
   }
 
   if (w === "Acrylic Partial Denture") {
-    let teethCount = calculateTeethCount(teethStr);
-    if (teethCount === 0) teethCount = 1;
+    const teethCount = parseInt(qtyField.value, 10) || 0;
     const basePlatePrice = 400;
     const pricePerTooth = 200;
+    
+    // Total cost for 1 Acrylic Partial Denture plate with N teeth
     unitField.value = basePlatePrice + (teethCount * pricePerTooth);
   } else if (priceDB[w] !== undefined) {
     unitField.value = priceDB[w];
